@@ -1,10 +1,7 @@
 package by.issoft.test;
 
 
-import by.issoft.test.bean.Order;
-import by.issoft.test.bean.OrderItem;
-import by.issoft.test.bean.OrderItemDatePrice;
-import by.issoft.test.bean.Product;
+import by.issoft.test.bean.*;
 import com.opencsv.bean.CsvToBeanBuilder;
 
 import java.io.FileNotFoundException;
@@ -15,9 +12,14 @@ import java.time.Month;
 import java.util.*;
 import java.util.concurrent.*;
 
+
 public class App {
 
     private static final Order POISON = new Order("POISON", new Date());
+    private static final List<OrderItemDatePrice> POISON_QUEUE = new LinkedList<>();
+    static {
+        POISON_QUEUE.add(new OrderItemDatePrice());
+    }
     private static final int NUMBER_OF_THREADS = Runtime.getRuntime().availableProcessors();
 
     public static void main(String[] args) throws ParseException, FileNotFoundException {
@@ -49,41 +51,69 @@ public class App {
         uniqueDates.forEach(localDate -> dayProductItemsMap.put(localDate, new LinkedBlockingQueue<>()));
 
 
-        BlockingQueue<OrderItemDatePrice> orderItemDatePrices = new LinkedBlockingQueue<>();
         BlockingQueue<Order> orderBlockingQueue = new LinkedBlockingQueue<>(orders);
-
 
         for (int i = 0; i < NUMBER_OF_THREADS; i++) {
             orderBlockingQueue.add(POISON);
         }
 
-        CountDownLatch countDownLatch = new CountDownLatch(NUMBER_OF_THREADS);
-        ExecutorService executor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
+        CountDownLatch orderItemDatePriceCountDownLatch = new CountDownLatch(NUMBER_OF_THREADS);
+        ExecutorService orderItemDatePriceExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
         for (int i = 0; i < NUMBER_OF_THREADS; i++) {
-            executor.execute(new OrderItemDatePriceConsumer(orderBlockingQueue, orderItems, products
-                    , dayProductItemsMap, countDownLatch, POISON));
+            orderItemDatePriceExecutor.execute(new OrderItemDatePriceConsumer(orderBlockingQueue, orderItems, products
+                    , dayProductItemsMap, orderItemDatePriceCountDownLatch, POISON));
         }
 
 
         try {
-            countDownLatch.await();
+            orderItemDatePriceCountDownLatch.await();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        executor.shutdown();
+        orderItemDatePriceExecutor.shutdown();
+
+//        dayProductItemsMap.forEach((localDate, orderItemDatePrices) -> {
+//            orderItemDatePrices.forEach(orderItemDatePrice -> {
+//                if (orderItemDatePrice.getDate() == null)
+//                    System.out.println("AAAAAAAAAAAAAAAAAAAAAAAA");
+//            });
+//        });
 
 
 
-        LocalDate inputDate = LocalDate.of(2021, Month.JANUARY,21);
-        ArrayList<LocalDate> localDates = new ArrayList<>(uniqueDates);
-        dayProductItemsMap.get(inputDate).forEach(orderItemDatePrice -> System.out.println(orderItemDatePrice));
+        BlockingQueue<List<OrderItemDatePrice>> dayQueues = new LinkedBlockingQueue<>();
+        dayProductItemsMap.forEach((k, v) -> dayQueues.add(new ArrayList<>(v)));
+
+        BlockingQueue<DayTotalProductPrice> dayTotalProductPrices = new LinkedBlockingQueue<>();
 
 
-        //
-        //
+        for (int i = 0; i < NUMBER_OF_THREADS; i++) {
+            dayQueues.add(POISON_QUEUE);
+        }
+
+
+
+        CountDownLatch dayTotalProductPricesCountDownLatch = new CountDownLatch(NUMBER_OF_THREADS);
+        ExecutorService dayTotalProductPricesExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
+        for (int i = 0; i < NUMBER_OF_THREADS; i++) {
+            dayTotalProductPricesExecutor.execute(new DayTotalProductPriceConsumer(dayQueues, dayTotalProductPrices
+                    , POISON_QUEUE, dayTotalProductPricesCountDownLatch));
+        }
+
+        try {
+            dayTotalProductPricesCountDownLatch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        dayTotalProductPricesExecutor.shutdown();
+
+        LocalDate date = LocalDate.of(2021, Month.JANUARY, 21);
+//        dayTotalProductPrices.forEach(dayTotalProductPrice -> System.out.println(dayTotalProductPrice));
+        dayTotalProductPrices.stream().filter(item -> item.getDate().equals(date)).forEach( item -> System.out.println(item));
+
+
+
+
 
     }
-
-
-
 }
