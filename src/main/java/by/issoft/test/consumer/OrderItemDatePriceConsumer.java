@@ -1,5 +1,6 @@
-package by.issoft.test;
+package by.issoft.test.consumer;
 
+import by.issoft.test.Util;
 import by.issoft.test.bean.Order;
 import by.issoft.test.bean.OrderItem;
 import by.issoft.test.bean.OrderItemDatePrice;

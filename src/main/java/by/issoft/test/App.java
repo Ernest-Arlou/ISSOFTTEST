@@ -2,6 +2,8 @@ package by.issoft.test;
 
 
 import by.issoft.test.bean.*;
+import by.issoft.test.consumer.DayTotalProductPriceConsumer;
+import by.issoft.test.consumer.OrderItemDatePriceConsumer;
 import com.opencsv.bean.CsvToBeanBuilder;
 
 import java.io.FileNotFoundException;
@@ -99,7 +101,7 @@ public class App {
         dayTotalProductPricesExecutor.shutdown();
 
 
-        dayTotalProductPrices.forEach(dayTotalProductPrice -> System.out.println(dayTotalProductPrice));
+        dayTotalProductPrices.forEach(x -> System.out.println(x.getDate() + " " +x.getMaxProfit().getName() + " " +x.getMaxProfit().getPrice() ));
 
 //        LocalDate date = LocalDate.of(2021, Month.JANUARY, 21);
 //        dayTotalProductPrices.stream().filter(item -> item.getDate().equals(date)).forEach( item -> System.out.println(item));

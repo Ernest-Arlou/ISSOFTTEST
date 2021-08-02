@@ -1,4 +1,4 @@
-package by.issoft.test;
+package by.issoft.test.consumer;
 
 import by.issoft.test.bean.DayTotalProductPrice;
 import by.issoft.test.bean.OrderItemDatePrice;
