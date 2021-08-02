@@ -8,7 +8,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.text.ParseException;
 import java.time.LocalDate;
-import java.time.Month;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -17,10 +16,11 @@ public class App {
 
     private static final Order POISON = new Order("POISON", new Date());
     private static final List<OrderItemDatePrice> POISON_QUEUE = new LinkedList<>();
+    private static final int NUMBER_OF_THREADS = Runtime.getRuntime().availableProcessors();
+
     static {
         POISON_QUEUE.add(new OrderItemDatePrice());
     }
-    private static final int NUMBER_OF_THREADS = Runtime.getRuntime().availableProcessors();
 
     public static void main(String[] args) throws ParseException, FileNotFoundException {
         String ordersPath = "X:\\orders.csv";
@@ -72,14 +72,6 @@ public class App {
         }
         orderItemDatePriceExecutor.shutdown();
 
-//        dayProductItemsMap.forEach((localDate, orderItemDatePrices) -> {
-//            orderItemDatePrices.forEach(orderItemDatePrice -> {
-//                if (orderItemDatePrice.getDate() == null)
-//                    System.out.println("AAAAAAAAAAAAAAAAAAAAAAAA");
-//            });
-//        });
-
-
 
         BlockingQueue<List<OrderItemDatePrice>> dayQueues = new LinkedBlockingQueue<>();
         dayProductItemsMap.forEach((k, v) -> dayQueues.add(new ArrayList<>(v)));
@@ -90,7 +82,6 @@ public class App {
         for (int i = 0; i < NUMBER_OF_THREADS; i++) {
             dayQueues.add(POISON_QUEUE);
         }
-
 
 
         CountDownLatch dayTotalProductPricesCountDownLatch = new CountDownLatch(NUMBER_OF_THREADS);
@@ -107,12 +98,11 @@ public class App {
         }
         dayTotalProductPricesExecutor.shutdown();
 
-        LocalDate date = LocalDate.of(2021, Month.JANUARY, 21);
-//        dayTotalProductPrices.forEach(dayTotalProductPrice -> System.out.println(dayTotalProductPrice));
-        dayTotalProductPrices.stream().filter(item -> item.getDate().equals(date)).forEach( item -> System.out.println(item));
 
+        dayTotalProductPrices.forEach(dayTotalProductPrice -> System.out.println(dayTotalProductPrice));
 
-
+//        LocalDate date = LocalDate.of(2021, Month.JANUARY, 21);
+//        dayTotalProductPrices.stream().filter(item -> item.getDate().equals(date)).forEach( item -> System.out.println(item));
 
 
     }

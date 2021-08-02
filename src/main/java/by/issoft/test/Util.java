@@ -5,7 +5,7 @@ import java.time.ZoneId;
 import java.util.Date;
 
 public class Util {
-    public static LocalDate getLocalDate(Date date){
+    public static LocalDate getLocalDate(Date date) {
         return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }
 }

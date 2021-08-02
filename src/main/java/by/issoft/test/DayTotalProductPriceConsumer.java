@@ -38,7 +38,7 @@ public class DayTotalProductPriceConsumer implements Runnable {
                 continue;
             }
 
-            if (list.equals(POISON_QUEUE)){
+            if (list.equals(POISON_QUEUE)) {
                 countDownLatch.countDown();
                 break;
             }
@@ -60,7 +60,7 @@ public class DayTotalProductPriceConsumer implements Runnable {
                     product.setPrice(product.getPrice() + item.getTotalPrice());
                     products.put(item.getProductId(), product);
                     if (dayTotalProductPrice.getMaxProfit() == null
-                            || dayTotalProductPrice.getMaxProfit().getPrice() < product.getPrice()){
+                            || dayTotalProductPrice.getMaxProfit().getPrice() < product.getPrice()) {
                         dayTotalProductPrice.setMaxProfit(product);
                     }
                 } else {
