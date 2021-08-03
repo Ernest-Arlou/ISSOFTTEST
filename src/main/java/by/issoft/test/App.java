@@ -2,110 +2,33 @@ package by.issoft.test;
 
 
 import by.issoft.test.bean.*;
-import by.issoft.test.consumer.DayTotalProductPriceConsumer;
-import by.issoft.test.consumer.OrderItemDatePriceConsumer;
-import com.opencsv.bean.CsvToBeanBuilder;
+import by.issoft.test.dao.DAO;
+import by.issoft.test.logic.Service;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.*;
 
 
 public class App {
+    private static final String ORDERS_PATH = "X:\\orders.csv";
+    private static final String ORDER_ITEMS_PATH = "X:\\order_items.csv";
+    private static final String PRODUCTS_PATH = "X:\\products.csv";
 
-    private static final Order POISON = new Order("POISON", new Date());
-    private static final List<OrderItemDatePrice> POISON_QUEUE = new LinkedList<>();
-    private static final int NUMBER_OF_THREADS = Runtime.getRuntime().availableProcessors();
+    public static void main(String[] args) {
+        DAO dao = new DAO();
 
-    static {
-        POISON_QUEUE.add(new OrderItemDatePrice());
-    }
+        List<Order> orders = dao.getOrders(ORDERS_PATH);
+        List<OrderItem> orderItems = dao.getOrderItems(ORDER_ITEMS_PATH);
+        List<Product> products = dao.getProducts(PRODUCTS_PATH);
 
-    public static void main(String[] args) throws ParseException, FileNotFoundException {
-        String ordersPath = "X:\\orders.csv";
-        String orderItemsPath = "X:\\order_items.csv";
-        String productsPath = "X:\\products.csv";
+        if (orders == null || orderItems == null || products == null)
+            return;
 
+        Service service = new Service();
 
-        List<Order> orders = new CsvToBeanBuilder(new FileReader(ordersPath))
-                .withType(Order.class)
-                .build()
-                .parse();
-
-        List<OrderItem> orderItems = new CsvToBeanBuilder(new FileReader(orderItemsPath))
-                .withType(OrderItem.class)
-                .build()
-                .parse();
-
-        List<Product> products = new CsvToBeanBuilder(new FileReader(productsPath))
-                .withType(Product.class)
-                .build()
-                .parse();
-
-
-        Set<LocalDate> uniqueDates = new HashSet<>();
-        orders.forEach(order -> uniqueDates.add(Util.getLocalDate(order.getDate())));
-
-        ConcurrentMap<LocalDate, BlockingQueue<OrderItemDatePrice>> dayProductItemsMap = new ConcurrentHashMap<>();
-        uniqueDates.forEach(localDate -> dayProductItemsMap.put(localDate, new LinkedBlockingQueue<>()));
-
-
-        BlockingQueue<Order> orderBlockingQueue = new LinkedBlockingQueue<>(orders);
-
-        for (int i = 0; i < NUMBER_OF_THREADS; i++) {
-            orderBlockingQueue.add(POISON);
-        }
-
-        CountDownLatch orderItemDatePriceCountDownLatch = new CountDownLatch(NUMBER_OF_THREADS);
-        ExecutorService orderItemDatePriceExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
-        for (int i = 0; i < NUMBER_OF_THREADS; i++) {
-            orderItemDatePriceExecutor.execute(new OrderItemDatePriceConsumer(orderBlockingQueue, orderItems, products
-                    , dayProductItemsMap, orderItemDatePriceCountDownLatch, POISON));
-        }
-
-
-        try {
-            orderItemDatePriceCountDownLatch.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        orderItemDatePriceExecutor.shutdown();
-
-
-        BlockingQueue<List<OrderItemDatePrice>> dayQueues = new LinkedBlockingQueue<>();
-        dayProductItemsMap.forEach((k, v) -> dayQueues.add(new ArrayList<>(v)));
-
-        BlockingQueue<DayTotalProductPrice> dayTotalProductPrices = new LinkedBlockingQueue<>();
-
-
-        for (int i = 0; i < NUMBER_OF_THREADS; i++) {
-            dayQueues.add(POISON_QUEUE);
-        }
-
-
-        CountDownLatch dayTotalProductPricesCountDownLatch = new CountDownLatch(NUMBER_OF_THREADS);
-        ExecutorService dayTotalProductPricesExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
-        for (int i = 0; i < NUMBER_OF_THREADS; i++) {
-            dayTotalProductPricesExecutor.execute(new DayTotalProductPriceConsumer(dayQueues, dayTotalProductPrices
-                    , POISON_QUEUE, dayTotalProductPricesCountDownLatch));
-        }
-
-        try {
-            dayTotalProductPricesCountDownLatch.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        dayTotalProductPricesExecutor.shutdown();
-
-
-        dayTotalProductPrices.forEach(x -> System.out.println(x.getDate() + " " +x.getMaxProfit().getName() + " " +x.getMaxProfit().getPrice() ));
-
-//        LocalDate date = LocalDate.of(2021, Month.JANUARY, 21);
-//        dayTotalProductPrices.stream().filter(item -> item.getDate().equals(date)).forEach( item -> System.out.println(item));
-
+        BlockingQueue<DayTotalProductPrice> dayTotalProductPrices = service.getDayTotalProductPrices(orders,orderItems,products);
+        dayTotalProductPrices.forEach(x -> System.out.println(x.getDate() + " " + x.getMaxProfit().getName() + " " + x.getMaxProfit().getPrice()));
 
     }
 }

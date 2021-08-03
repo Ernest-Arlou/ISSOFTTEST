@@ -1,4 +1,4 @@
-package by.issoft.test.consumer;
+package by.issoft.test.logic;
 
 import by.issoft.test.Util;
 import by.issoft.test.bean.Order;
@@ -12,7 +12,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CountDownLatch;
 
-public class OrderItemDatePriceConsumer implements Runnable {
+public class ItemsWPricePerDayConsumer implements Runnable {
     private final BlockingQueue<Order> orders;
     private final List<OrderItem> orderItems;
     private final List<Product> products;
@@ -20,7 +20,7 @@ public class OrderItemDatePriceConsumer implements Runnable {
     private final CountDownLatch countDownLatch;
     private final Order POISON;
 
-    public OrderItemDatePriceConsumer(BlockingQueue<Order> orders, List<OrderItem> orderItems, List<Product> products
+    public ItemsWPricePerDayConsumer(BlockingQueue<Order> orders, List<OrderItem> orderItems, List<Product> products
             , ConcurrentMap<LocalDate, BlockingQueue<OrderItemDatePrice>> dayProductItemsMap, CountDownLatch countDownLatch, Order poison) {
 
         this.countDownLatch = countDownLatch;
