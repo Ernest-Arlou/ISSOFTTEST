@@ -64,7 +64,7 @@ public class ServiceTest {
     }
 
     @Test
-    public void testGetDayTotalProductPrices() {
+    public void getDayTotalProductPrices() {
         BlockingQueue<DayTotalProductPrice> dayTotalProductPrices = SERVICE.getDayTotalProductPrices(orders,orderItems,products);
         ArrayList<DayTotalProductPrice> arrayList = new ArrayList<>(dayTotalProductPrices);
 
