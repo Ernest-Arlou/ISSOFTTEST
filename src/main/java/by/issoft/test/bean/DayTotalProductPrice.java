@@ -1,10 +1,12 @@
 package by.issoft.test.bean;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.Objects;
 
-public class DayTotalProductPrice {
+public class DayTotalProductPrice implements Serializable {
+    private static final long serialVersionUID = -8287432706317538095L;
     private LocalDate date;
     private Map<String, Product> products;
     private Product maxProfit;
@@ -64,7 +66,8 @@ public class DayTotalProductPrice {
 
     @Override
     public String toString() {
-        return "DayTotalProductPrice{" +
+        return getClass().getName() + "@" + Integer.toHexString(hashCode()) +
+                "{" +
                 "date=" + date +
                 ", maxProfit=" + maxProfit +
 //                ", products=" + products +

@@ -2,7 +2,6 @@ package by.issoft.test.logic;
 
 import by.issoft.test.Util;
 import by.issoft.test.bean.*;
-import by.issoft.test.dao.DAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,18 +14,19 @@ public class Service {
     private static final Logger logger = LoggerFactory.getLogger(Service.class);
     private static final Order POISON = new Order("POISON", new Date());
     private static final List<OrderItemDatePrice> POISON_QUEUE = new LinkedList<>();
+
     static {
         POISON_QUEUE.add(new OrderItemDatePrice());
     }
 
 
-    private Set<LocalDate> getUniqueDates(List<Order> orders){
+    private Set<LocalDate> getUniqueDates(List<Order> orders) {
         Set<LocalDate> uniqueDates = new HashSet<>();
         orders.forEach(order -> uniqueDates.add(Util.getLocalDate(order.getDate())));
         return uniqueDates;
     }
 
-    public BlockingQueue<List<OrderItemDatePrice>> getItemsWPricePerDay(List<Order> orders, List<OrderItem> orderItems, List<Product> products){
+    public BlockingQueue<List<OrderItemDatePrice>> getItemsWPricePerDay(List<Order> orders, List<OrderItem> orderItems, List<Product> products) {
 
         Set<LocalDate> uniqueDates = getUniqueDates(orders);
 
@@ -59,7 +59,7 @@ public class Service {
         return dayQueues;
     }
 
-    public BlockingQueue<DayTotalProductPrice> getDayTotalProductPrices(BlockingQueue<List<OrderItemDatePrice>> itemsWPricePerDay){
+    public BlockingQueue<DayTotalProductPrice> getDayTotalProductPrices(BlockingQueue<List<OrderItemDatePrice>> itemsWPricePerDay) {
         BlockingQueue<DayTotalProductPrice> dayTotalProductPrices = new LinkedBlockingQueue<>();
 
         for (int i = 0; i < NUMBER_OF_THREADS; i++) {
@@ -84,8 +84,8 @@ public class Service {
         return dayTotalProductPrices;
     }
 
-    public BlockingQueue<DayTotalProductPrice> getDayTotalProductPrices(List<Order> orders, List<OrderItem> orderItems, List<Product> products){
-        return getDayTotalProductPrices(getItemsWPricePerDay(orders,orderItems, products));
+    public BlockingQueue<DayTotalProductPrice> getDayTotalProductPrices(List<Order> orders, List<OrderItem> orderItems, List<Product> products) {
+        return getDayTotalProductPrices(getItemsWPricePerDay(orders, orderItems, products));
     }
 
 

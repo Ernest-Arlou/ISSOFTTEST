@@ -50,11 +50,11 @@ public class DayTotalProductPriceConsumer implements Runnable {
 
 
             list.forEach(item -> {
+                if (!dateSet) {
+                    dayTotalProductPrice.setDate(item.getDate());
+                    dateSet = true;
+                }
                 if (products.containsKey(item.getProductId())) {
-                    if (!dateSet) {
-                        dayTotalProductPrice.setDate(item.getDate());
-                        dateSet = true;
-                    }
                     Product product = products.get(item.getProductId());
                     products.remove(item.getProductId());
                     product.setPrice(product.getPrice() + item.getTotalPrice());
@@ -65,6 +65,10 @@ public class DayTotalProductPriceConsumer implements Runnable {
                     }
                 } else {
                     products.put(item.getProductId(), new Product(item.getProductId(), item.getProductName(), item.getTotalPrice()));
+                    if(dayTotalProductPrice.getMaxProfit() == null
+                            || dayTotalProductPrice.getMaxProfit().getPrice() < item.getTotalPrice()){
+                        dayTotalProductPrice.setMaxProfit(new Product(item.getProductId(), item.getProductName(), item.getTotalPrice()));
+                    }
                 }
             });
             dayTotalProductPrices.add(dayTotalProductPrice);

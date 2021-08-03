@@ -2,7 +2,10 @@ package by.issoft.test.bean;
 
 import com.opencsv.bean.CsvBindByName;
 
-public class Product {
+import java.io.Serializable;
+
+public class Product implements Serializable {
+    private static final long serialVersionUID = -3435714586738612636L;
     @CsvBindByName(column = "ID")
     private String id;
     @CsvBindByName(column = "NAME")
@@ -45,7 +48,8 @@ public class Product {
 
     @Override
     public String toString() {
-        return "Product{" +
+        return getClass().getName() + "@" + Integer.toHexString(hashCode()) +
+                "{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", pricePerUnit=" + price +

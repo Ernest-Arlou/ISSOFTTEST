@@ -1,13 +1,15 @@
 package by.issoft.test;
 
 
-import by.issoft.test.bean.*;
+import by.issoft.test.bean.DayTotalProductPrice;
+import by.issoft.test.bean.Order;
+import by.issoft.test.bean.OrderItem;
+import by.issoft.test.bean.Product;
 import by.issoft.test.dao.DAO;
 import by.issoft.test.logic.Service;
 
-import java.time.LocalDate;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
 
 
 public class App {
@@ -27,7 +29,7 @@ public class App {
 
         Service service = new Service();
 
-        BlockingQueue<DayTotalProductPrice> dayTotalProductPrices = service.getDayTotalProductPrices(orders,orderItems,products);
+        BlockingQueue<DayTotalProductPrice> dayTotalProductPrices = service.getDayTotalProductPrices(orders, orderItems, products);
         dayTotalProductPrices.forEach(x -> System.out.println(x.getDate() + " " + x.getMaxProfit().getName() + " " + x.getMaxProfit().getPrice()));
 
     }

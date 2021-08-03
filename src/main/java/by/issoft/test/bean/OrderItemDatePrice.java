@@ -1,9 +1,11 @@
 package by.issoft.test.bean;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class OrderItemDatePrice {
+public class OrderItemDatePrice implements Serializable {
+    private static final long serialVersionUID = 8577604104459901069L;
     private String orderId;
     private String productId;
     private String productName;
@@ -80,7 +82,8 @@ public class OrderItemDatePrice {
 
     @Override
     public String toString() {
-        return "OrderItemDatePrice{" +
+        return getClass().getName() + "@" + Integer.toHexString(hashCode()) +
+                "{" +
                 "orderId='" + orderId + '\'' +
                 ", productId='" + productId + '\'' +
                 ", productName='" + productName + '\'' +

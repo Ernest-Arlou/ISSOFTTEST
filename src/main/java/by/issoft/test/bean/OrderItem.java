@@ -2,7 +2,10 @@ package by.issoft.test.bean;
 
 import com.opencsv.bean.CsvBindByName;
 
-public class OrderItem {
+import java.io.Serializable;
+
+public class OrderItem implements Serializable {
+    private static final long serialVersionUID = -4078247888051748633L;
     @CsvBindByName(column = "ORDER_ID")
     private String orderId;
     @CsvBindByName(column = "PRODUCT_ID")
@@ -45,7 +48,8 @@ public class OrderItem {
 
     @Override
     public String toString() {
-        return "OrderItem{" +
+        return getClass().getName() + "@" + Integer.toHexString(hashCode()) +
+                "{" +
                 "orderId='" + orderId + '\'' +
                 ", productId='" + productId + '\'' +
                 ", quantity=" + quantity +

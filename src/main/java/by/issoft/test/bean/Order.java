@@ -3,15 +3,19 @@ package by.issoft.test.bean;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvDate;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 
-public class Order {
+public class Order implements Serializable {
+    private static final long serialVersionUID = -7418382734486249507L;
     @CsvBindByName(column = "ID")
     private String id;
     @CsvBindByName(column = "DATE_TIME")
     @CsvDate("yyyy-MM-dd")
     private Date date;
+
+
 
     public Order(String id, Date date) {
         this.id = id;
@@ -53,7 +57,8 @@ public class Order {
 
     @Override
     public String toString() {
-        return "Order{" +
+        return getClass().getName() + "@" + Integer.toHexString(hashCode()) +
+                "{" +
                 "id='" + id + '\'' +
                 ", date=" + date +
                 '}';
