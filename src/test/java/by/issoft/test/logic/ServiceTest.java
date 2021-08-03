@@ -43,9 +43,6 @@ public class ServiceTest {
 
         products.add(new Product(productId1, productId1, 5));
         products.add(new Product(productId2, productId2, 5));
-
-
-
     }
 
 
