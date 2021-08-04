@@ -3,6 +3,7 @@ package by.issoft.test.logic;
 import by.issoft.test.bean.*;
 import org.junit.Test;
 
+import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.*;
@@ -11,7 +12,7 @@ import java.util.concurrent.BlockingQueue;
 import static org.junit.Assert.*;
 
 public class ServiceTest {
-    private static final Service SERVICE = new Service();
+    private static final ServiceImpl SERVICE_IMPL = new ServiceImpl();
     private static final List<Order> orders = new ArrayList<>();
     private static final List<OrderItem> orderItems = new ArrayList<>();
     private static final List<Product> products = new ArrayList<>();
@@ -48,7 +49,7 @@ public class ServiceTest {
 
     @Test
     public void getItemsWPricePerDay() {
-        BlockingQueue<List<OrderItemDatePrice>> dayQueues = SERVICE.getItemsWPricePerDay(orders,orderItems,products);
+        BlockingQueue<List<OrderItemDatePrice>> dayQueues = SERVICE_IMPL.getItemsWPricePerDay(orders,orderItems,products);
 
         List<List<OrderItemDatePrice>> lists = new ArrayList<>(dayQueues);
         lists.forEach( orderItemDatePrices -> orderItemDatePrices.forEach(item -> {
@@ -65,7 +66,7 @@ public class ServiceTest {
 
     @Test
     public void getDayTotalProductPrices() {
-        BlockingQueue<DayTotalProductPrice> dayTotalProductPrices = SERVICE.getDayTotalProductPrices(orders,orderItems,products);
+        BlockingQueue<DayTotalProductPrice> dayTotalProductPrices = SERVICE_IMPL.getDayTotalProductPrices(SERVICE_IMPL.getItemsWPricePerDay(orders,orderItems,products));
         ArrayList<DayTotalProductPrice> arrayList = new ArrayList<>(dayTotalProductPrices);
 
         assertEquals(3,arrayList.size());

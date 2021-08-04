@@ -2,13 +2,9 @@ package by.issoft.test;
 
 
 import by.issoft.test.bean.DayTotalProductPrice;
-import by.issoft.test.bean.Order;
-import by.issoft.test.bean.OrderItem;
-import by.issoft.test.bean.Product;
-import by.issoft.test.dao.DAO;
 import by.issoft.test.logic.Service;
+import by.issoft.test.logic.ServiceHolder;
 
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 
@@ -18,18 +14,10 @@ public class App {
     private static final String PRODUCTS_PATH = "X:\\products.csv";
 
     public static void main(String[] args) {
-        DAO dao = new DAO();
 
-        List<Order> orders = dao.getOrders(ORDERS_PATH);
-        List<OrderItem> orderItems = dao.getOrderItems(ORDER_ITEMS_PATH);
-        List<Product> products = dao.getProducts(PRODUCTS_PATH);
+        Service service = ServiceHolder.getInstance().getService();
 
-        if (orders == null || orderItems == null || products == null)
-            return;
-
-        Service service = new Service();
-
-        BlockingQueue<DayTotalProductPrice> dayTotalProductPrices = service.getDayTotalProductPrices(orders, orderItems, products);
+        BlockingQueue<DayTotalProductPrice> dayTotalProductPrices = service.getDayTotalProductPrices(ORDERS_PATH, ORDER_ITEMS_PATH, PRODUCTS_PATH);
         dayTotalProductPrices.forEach(x -> System.out.println(x.getDate() + " " + x.getMaxProfit().getName() + " " + x.getMaxProfit().getPrice()));
 
     }
